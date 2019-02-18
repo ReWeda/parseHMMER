@@ -1,4 +1,5 @@
 import json
+import copy
 
 class parsHMMER:
 
@@ -245,52 +246,70 @@ class parsHMMER:
     def printHMMER(self, idnt=4):
         print (json.dumps(self.results, indent=idnt))
 
-    def best(self, verbose=False):
+    def best(self, verbose=False, top=1):
         if self.results :
-            return self.__find_best__(verbose)
+            return self.__find_best__(verbose, top)
         else:
             raise ValueError("Please, run the parse method before. If it has been done, HMMER didn't found matches.")
 
-    def __find_best__(self, verbose):
-        max_t = float("inf")
-        max_d = float("inf")
-        for target in self.results.keys():
-            if self.results[target]['full_sequence']['evalue'] < max_t :
-                max_t = self.results[target]['full_sequence']['evalue']
-                for domain in self.results[target]["this_domain"].keys():
-                    if self.results[target]["this_domain"][domain]['i_evalue'] < max_d :
-                        max_d = self.results[target]["this_domain"][domain]['i_evalue']
-                        if verbose :
-                            self.bestMatch = (
-                                target,
-                                self.results[target]["target_accession"],
-                                self.results[target]["description"],
-                                self.results[target]['full_sequence']['evalue'],
-                                self.results[target]['full_sequence']['score'],
-                                self.results[target]['full_sequence']['bias'],
-                                domain,
-                                len(self.results[target]["this_domain"].keys()),
-                                self.results[target]["this_domain"][domain]['c_evalue'],
-                                self.results[target]["this_domain"][domain]['i_evalue'],
-                                self.results[target]["this_domain"][domain]['score'],
-                                self.results[target]["this_domain"][domain]['bias'],
-                                self.results[target]["this_domain"][domain]['hmm_coord'],
-                                self.results[target]["this_domain"][domain]['ali_coord'],
-                                self.results[target]["this_domain"][domain]['env_coord'],
-                                self.results[target]["this_domain"][domain]['accuracy'],
-                            )
-                        else:
-                            self.bestMatch = (
-                                target,
-                                self.results[target]['full_sequence']['evalue'],
-                                domain,
-                                len(self.results[target]["this_domain"].keys()),
-                                self.results[target]["this_domain"][domain]['i_evalue'],
-                                self.results[target]["this_domain"][domain]['hmm_coord'],
-                                self.results[target]["this_domain"][domain]['ali_coord'],
-                                self.results[target]["this_domain"][domain]['accuracy'],
-                            )
-        return self.bestMatch
+    def __find_best__(self, verbose, top):
+        slave_dictionary = copy.deepcopy(self.results)
+        best_match = []
+        i = 0
+        while i < top :
+            max_t = float("inf")
+            max_d = float("inf")
+            for target in slave_dictionary.keys():
+                if slave_dictionary[target]['full_sequence']['evalue'] < max_t :
+                    for domain in slave_dictionary[target]["this_domain"].keys():
+                        if slave_dictionary[target]["this_domain"][domain]['i_evalue'] < max_d :
+                            best_domain = domain
+                            best_target = target
+                            max_t = slave_dictionary[target]['full_sequence']['evalue']
+                            max_d = slave_dictionary[target]["this_domain"][domain]['i_evalue']
+                            if verbose :
+                                best_match.append(
+                                    (
+                                        target,
+                                        slave_dictionary[target]["target_accession"],
+                                        slave_dictionary[target]["description"],
+                                        slave_dictionary[target]['full_sequence']['evalue'],
+                                        slave_dictionary[target]['full_sequence']['score'],
+                                        slave_dictionary[target]['full_sequence']['bias'],
+                                        domain,
+                                        len(slave_dictionary[target]["this_domain"].keys()),
+                                        slave_dictionary[target]["this_domain"][domain]['c_evalue'],
+                                        slave_dictionary[target]["this_domain"][domain]['i_evalue'],
+                                        slave_dictionary[target]["this_domain"][domain]['score'],
+                                        slave_dictionary[target]["this_domain"][domain]['bias'],
+                                        slave_dictionary[target]["this_domain"][domain]['hmm_coord'],
+                                        slave_dictionary[target]["this_domain"][domain]['ali_coord'],
+                                        slave_dictionary[target]["this_domain"][domain]['env_coord'],
+                                        slave_dictionary[target]["this_domain"][domain]['accuracy']
+                                    )
+                                )
+                            else:
+                                best_match.append(
+                                    (
+                                        target,
+                                        slave_dictionary[target]['full_sequence']['evalue'],
+                                        domain,
+                                        len(slave_dictionary[target]["this_domain"].keys()),
+                                        slave_dictionary[target]["this_domain"][domain]['i_evalue'],
+                                        slave_dictionary[target]["this_domain"][domain]['hmm_coord'],
+                                        slave_dictionary[target]["this_domain"][domain]['ali_coord'],
+                                        slave_dictionary[target]["this_domain"][domain]['accuracy']
+                                    )
+                                )
+            # User asked for a number of best match higher than the total number of available matches
+            if not slave_dictionary :
+                break   # Exit the While loop
+            slave_dictionary[best_target]['this_domain'].pop(best_domain, None)
+            if not slave_dictionary[best_target]['this_domain'] :
+                # If we ended up removing all the domains for that target, pop the target too
+                slave_dictionary.pop(best_target, None)
+            i += 1
+        return best_match
 
     
     
