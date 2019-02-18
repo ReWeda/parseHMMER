@@ -49,7 +49,7 @@ Feel free to use parsHMMER if needed.
 
 If you are interested in using parsHMMER but the parsing method for your problem hasn't been implemented yet, please, contact me.
 
-For problems, dubts and error please, contact me
+For problems, doubts and error please, contact me
 
 contact : davide.baldazzi8@unibo.it
 

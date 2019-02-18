@@ -15,13 +15,6 @@ class parsHMMER:
         self.__domt_header = '#  '  # Find a more precise way to define domtblout file; for now that's good
         self.results = {}
 
-
-    @staticmethod
-    def __read_output__(file_):
-        with open(file_, 'r') as f_:
-            container = f_.readlines()
-        return [ line.rstrip() for line in container]
-
     def __check_input__(self):
         if self.container[0] == self.__main_header :
             return True
@@ -299,3 +292,9 @@ class parsHMMER:
                                 self.results[target]["this_domain"][domain]['accuracy'],
                             )
         return self.bestMatch
+
+    @staticmethod
+    def __read_output__(file_):
+        with open(file_, 'r') as f_:
+            container = f_.readlines()
+        return [ line.rstrip() for line in container]
