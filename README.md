@@ -37,7 +37,7 @@ instance = parsHMMER(input_file)
 extracted_output = instance.parse()
 
 # Return a tuple with best match information from the parsed output
-best_match = parseinstanceHMMER.best()
+best_match = instance.best()
 
 # Print to screen extracted data in json format
 instance.printHMMER()
