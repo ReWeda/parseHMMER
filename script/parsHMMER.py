@@ -72,7 +72,7 @@ class parsHMMER:
                     'target_accession'      : '-',
                     'query_name'            : query,
                     'query_description'     : description,
-                    'query_length'         : int(query_length),
+                    'query_length'          : int(query_length),
                     'full_sequence' : {
                         'evalue'            : float(evalue_fs),
                         'score'             : float(score_fs),
@@ -206,7 +206,7 @@ class parsHMMER:
                         'target_accession'      : accessionT,
                         'target_length'         : int(tlen),
                         'query_name'            : query_name,
-                        'query_accession'       : accessionQ,
+                        'query_description'     : accessionQ,
                         'query_length'          : int(qlen),
                         'full_sequence' : {
                             'evalue'            : float(evalue_fs),
@@ -311,7 +311,204 @@ class parsHMMER:
             i += 1
         return best_match
 
-    
+    @staticmethod
+    def writeHMMER(path, content, label_list=[]):
+        # Check if an array of dictionary from this class 
+        # have been passed as argument or not
+        # Only a dictionary or an array of dictionary can be passed
+        # Check if labels are provided
+        # Check if enough labels have been provided
+        if type(content) == dict :
+            d = content
+            if not label_list:
+                label_list = ['HMMER_output_1']
+            else:
+                if not len(label_list) == 1 :
+                    print ("Number of provided Label doesn't match the number of dictionary. Labels are set back to the standard format.")
+                    label_list = ['HMMER_output_1']
+
+            is_validated = parsHMMER.__check_dictionary_structure__(content)
+            if not is_validated[0] :
+                # Bad structure for the dictionary
+                if is_validated[-1] == 'key_error' :
+                    raise KeyError("Bad dictionary Structure. Missing key '{}' in target {} ".format(is_validated[2], is_validated[1]))
+                else:
+                    if len(is_validated) == 6:
+                        raise TypeError("Bad dictionary Structure. Wrong variable type in key '{}' for model {} in sub-key {} in target {} ".format(is_validated[2], is_validated[1], is_validated[3], is_validated[4]))
+                    else:
+                        raise TypeError("Bad dictionary Structure. Wrong variable type in key '{}' for target {} ".format(is_validated[2], is_validated[1]))
+            else:
+                with open(path, 'w') as file_ :
+                    file_.write(','.join([
+                        'parsed_output',
+                        'query',
+                        'query_descr',
+                        'query_len',
+                        'target',
+                        'target_descr',
+                        'evalue',
+                        'score',
+                        'bias',
+                        'model',
+                        'c_evalue',
+                        'i_evalue',
+                        'model_score',
+                        'model_bias',
+                        'hmm_coord_s',
+                        'hmm_coord_e',
+                        'ali_coord_s',
+                        'ali_coord_e',
+                        'env_coord_s',
+                        'env_coord_e',
+                        'accuracy'
+                    ]) + '\n')
+                    for target_name in d.keys():
+                        for domain in d[target_name]['this_domain'].keys():
+                            file_.write(','.join([
+                                label_list[0],
+                                d[target_name]['query_name'],
+                                d[target_name]['query_description'],
+                                str(d[target_name]['query_length']),
+                                target_name,
+                                d[target_name]['target_accession'],
+                                str(d[target_name]['full_sequence']['evalue']),
+                                str(d[target_name]['full_sequence']['score']),
+                                str(d[target_name]['full_sequence']['bias']),
+                                str(domain),
+                                str(d[target_name]['this_domain'][domain]['c_evalue']),
+                                str(d[target_name]['this_domain'][domain]['i_evalue']),
+                                str(d[target_name]['this_domain'][domain]['score']),
+                                str(d[target_name]['this_domain'][domain]['bias']),
+                                str(d[target_name]['this_domain'][domain]['hmm_coord'][0]),
+                                str(d[target_name]['this_domain'][domain]['hmm_coord'][1]),
+                                str(d[target_name]['this_domain'][domain]['ali_coord'][0]),
+                                str(d[target_name]['this_domain'][domain]['ali_coord'][1]),
+                                str(d[target_name]['this_domain'][domain]['env_coord'][0]),
+                                str(d[target_name]['this_domain'][domain]['env_coord'][1]),
+                                str(d[target_name]['this_domain'][domain]['accuracy']),
+                                ]) + '\n')
+        elif type(content) == list :
+            if not label_list:
+                label_list = ['HMMER_output_{}'.format(i+1) for i in range(len(content))]
+            else:
+                if not len(label_list) == len(content) :
+                    print ("Number of provided Label doesn't match the number of dictionary. Labels are set back to the standard format.")
+                    label_list = ['HMMER_output_{}'.format(i+1) for i in range(len(content))]
+            i = 0
+            for d in content :
+                is_validated = parsHMMER.__check_dictionary_structure__(d)
+                if not is_validated[0] :
+                    # Bad structure for the dictionary
+                    if is_validated[-1] == 'key_error' :
+                        raise KeyError("Bad dictionary Structure on index {}. Missing key '{}' in target {} ".format(i, is_validated[2], is_validated[1]))
+                    else:
+                        if len(is_validated) == 6:
+                            raise TypeError("Bad dictionary Structure on index {}. Wrong variable type in key '{}' for model {} in sub-key {} in target {} ".format(i, is_validated[2], is_validated[1], is_validated[3], is_validated[4]))
+                        else:
+                            raise TypeError("Bad dictionary Structure on index {}. Wrong variable type in key '{}' for target {} ".format(i, is_validated[2], is_validated[1]))
+                i += 1
+            i = 0
+            with open(path, 'w') as file_:
+                file_.write(','.join([
+                        'parsed_output',
+                        'query',
+                        'query_descr',
+                        'query_len',
+                        'target',
+                        'target_descr',
+                        'evalue',
+                        'score',
+                        'bias',
+                        'model',
+                        'c_evalue',
+                        'i_evalue',
+                        'model_score',
+                        'model_bias',
+                        'hmm_coord_s',
+                        'hmm_coord_e',
+                        'ali_coord_s',
+                        'ali_coord_e',
+                        'env_coord_s',
+                        'env_coord_e',
+                        'accuracy'
+                    ]) + '\n')
+                for d in content :
+                    for target_name in d.keys():
+                        for domain in d[target_name]['this_domain'].keys():
+                            file_.write(','.join([
+                                label_list[i],
+                                d[target_name]['query_name'],
+                                d[target_name]['query_description'],
+                                str(d[target_name]['query_length']),
+                                target_name,
+                                d[target_name]['target_accession'],
+                                str(d[target_name]['full_sequence']['evalue']),
+                                str(d[target_name]['full_sequence']['score']),
+                                str(d[target_name]['full_sequence']['bias']),
+                                str(domain),
+                                str(d[target_name]['this_domain'][domain]['c_evalue']),
+                                str(d[target_name]['this_domain'][domain]['i_evalue']),
+                                str(d[target_name]['this_domain'][domain]['score']),
+                                str(d[target_name]['this_domain'][domain]['bias']),
+                                str(d[target_name]['this_domain'][domain]['hmm_coord'][0]),
+                                str(d[target_name]['this_domain'][domain]['hmm_coord'][1]),
+                                str(d[target_name]['this_domain'][domain]['ali_coord'][0]),
+                                str(d[target_name]['this_domain'][domain]['ali_coord'][1]),
+                                str(d[target_name]['this_domain'][domain]['env_coord'][0]),
+                                str(d[target_name]['this_domain'][domain]['env_coord'][1]),
+                                str(d[target_name]['this_domain'][domain]['accuracy']),
+                                ]) + '\n')
+                    i += 1
+        else:
+            wrong_type = type(content)
+            raise TypeError("Variable passed to writing function is of a wrong type ({}). writeHMMER() only accepts a dictionary returned from an instance of parsHMMER class or an array of them.".format(wrong_type))
+
+    @staticmethod
+    def __check_dictionary_structure__(d):
+        for target_name in d.keys():
+            # Check if all the L1 keys are present w/ the correct variable type
+            first_layer_keys = ['target_accession', 'query_name', 'query_description', 'description']
+            for k in first_layer_keys:
+                if not k in d[target_name] :
+                    return (False, target_name, k, 'key_error')
+                else:
+                    if not type(d[target_name][k]) == str :
+                        return (False, target_name, k, 'type_error')
+            if not 'query_length' in d[target_name]:
+                return (False, target_name, 'query_length', 'key_error')
+            else:
+                if not type(d[target_name]['query_length']) == int :
+                    return (False, target_name, 'query_length', 'type_error')
+            for k in ['full_sequence', 'this_domain']:
+                if not k in d[target_name]:
+                    return (False, target_name, k, 'key_error')
+
+            # Check if all the L2 keys are present w/ the correct variable type
+            full_seq_keys = ['evalue', 'score', 'bias']
+            for k in full_seq_keys:
+                if not k in d[target_name]['full_sequence'] :
+                    return (False, target_name, k, 'key_error')
+                else:
+                    if not type(d[target_name]['full_sequence'][k]) == float :
+                        return (False, target_name, k, 'type_error')
+
+            # Check This domain layer
+            this_domain_keys_float = ['c_evalue', 'i_evalue', 'score', 'bias', 'accuracy']
+            this_domain_keys_tuple = ['hmm_coord', 'ali_coord', 'env_coord']
+            for domain in d[target_name]['this_domain'].keys():
+                for k in this_domain_keys_float:
+                    if not k in d[target_name]['this_domain'][domain]:
+                        return (False, target_name, 'this_domain', 'key_error')
+                    else:
+                        if not type(d[target_name]['this_domain'][domain][k]) == float :
+                            return (False, target_name, 'this_domain', domain, k, 'type_error')
+                for k in this_domain_keys_tuple:
+                    if not k in d[target_name]['this_domain'][domain]:
+                        return (False, target_name, 'this_domain', 'key_error')
+                    else:
+                        if not type(d[target_name]['this_domain'][domain][k]) == tuple :
+                            return (False, target_name, 'this_domain', domain, k, 'type_error')
+        return (True,)
     
     @staticmethod
     def __read_output__(file_):
