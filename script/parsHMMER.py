@@ -181,26 +181,32 @@ class parsHMMER:
         # can change. We have to extract fields length in the line 
         # before matches' lines (idx.)
 
-        spacer_line = self.container[2]
-        idxs = [ x+1 for x in range(len(spacer_line)-1) if spacer_line[x]=='-' and spacer_line[x+1] != '-']
+        # 11th March 2019
+        # Observed that the last version of HMMER doesn't behave as previous ones.
+        # Larger field just steal space from the following field allowing line separation
+
+        # Not required anymore
+        # spacer_line = self.container[2]
+        # idxs = [ x+1 for x in range(len(spacer_line)-1) if spacer_line[x]=='-' and spacer_line[x+1] != '-']
         # line sample : #------- -----
         # I'm saving indexes of white space  
 
         for x in range(3, len(self.container)):
             line = self.container[x]
             if not line.startswith('#') :
-                fields = []
-                fields.append(
-                    line[:idxs[0]].strip()
-                )
-                for y in range(1,len(idxs)):
-                    fields.append(
-                        line[idxs[y-1]+1:idxs[y]].strip()
-                    )
-                fields.append(
-                    line[idxs[-1]+1:].strip()
-                )
-                target_name, accessionT, tlen, query_name, accessionQ, qlen, evalue_fs, score_fs, bias_fs, n_td, of_td, cevalue_td, ievalue_td, score_td, bias_td, hmmcoord_from, hmmcoord_to, alicoord_from, alicoord_to, envcoord_from, envcoord_to, acc, description = fields
+                # fields = []
+                # fields.append(
+                #     line[:idxs[0]].strip()
+                # )
+                # for y in range(1,len(idxs)):
+                #     fields.append(
+                #         line[idxs[y-1]+1:idxs[y]].strip()
+                #     )
+                # fields.append(
+                #     line[idxs[-1]+1:].strip()
+                # )
+                fields = line.split()
+                target_name, accessionT, tlen, query_name, accessionQ, qlen, evalue_fs, score_fs, bias_fs, n_td, of_td, cevalue_td, ievalue_td, score_td, bias_td, hmmcoord_from, hmmcoord_to, alicoord_from, alicoord_to, envcoord_from, envcoord_to, acc, description = [x.strip() for x in fields]
                 if not self.results.get(target_name):
                     self.results[target_name] = {
                         'target_accession'      : accessionT,
