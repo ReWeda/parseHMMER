@@ -292,9 +292,11 @@ class parsHMMER:
                                 best_match.append(
                                     (
                                         target,
+                                        slave_dictionary[target]['full_sequence']['score'],
                                         slave_dictionary[target]['full_sequence']['evalue'],
                                         domain,
                                         len(slave_dictionary[target]["this_domain"].keys()),
+                                        slave_dictionary[target]["this_domain"][domain]['score'],
                                         slave_dictionary[target]["this_domain"][domain]['i_evalue'],
                                         slave_dictionary[target]["this_domain"][domain]['hmm_coord'],
                                         slave_dictionary[target]["this_domain"][domain]['ali_coord'],
