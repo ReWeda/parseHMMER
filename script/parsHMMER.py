@@ -266,49 +266,49 @@ class parsHMMER:
             max_t = float("inf")
             max_d = float("inf")
             for target in slave_dictionary.keys():
-                if slave_dictionary[target]['full_sequence']['evalue'] < max_t :
+                if slave_dictionary[target]['full_sequence']['evalue'] <= max_t :
                     for domain in slave_dictionary[target]["this_domain"].keys():
                         if slave_dictionary[target]["this_domain"][domain]['i_evalue'] < max_d :
                             best_domain = domain
                             best_target = target
                             max_t = slave_dictionary[target]['full_sequence']['evalue']
                             max_d = slave_dictionary[target]["this_domain"][domain]['i_evalue']
-                            if verbose :
-                                best_match.append(
-                                    (
-                                        target,
-                                        slave_dictionary[target]["target_accession"],
-                                        slave_dictionary[target]["description"],
-                                        slave_dictionary[target]['full_sequence']['evalue'],
-                                        slave_dictionary[target]['full_sequence']['score'],
-                                        slave_dictionary[target]['full_sequence']['bias'],
-                                        domain,
-                                        len(slave_dictionary[target]["this_domain"].keys()),
-                                        slave_dictionary[target]["this_domain"][domain]['c_evalue'],
-                                        slave_dictionary[target]["this_domain"][domain]['i_evalue'],
-                                        slave_dictionary[target]["this_domain"][domain]['score'],
-                                        slave_dictionary[target]["this_domain"][domain]['bias'],
-                                        slave_dictionary[target]["this_domain"][domain]['hmm_coord'],
-                                        slave_dictionary[target]["this_domain"][domain]['ali_coord'],
-                                        slave_dictionary[target]["this_domain"][domain]['env_coord'],
-                                        slave_dictionary[target]["this_domain"][domain]['accuracy']
-                                    )
-                                )
-                            else:
-                                best_match.append(
-                                    (
-                                        target,
-                                        slave_dictionary[target]['full_sequence']['score'],
-                                        slave_dictionary[target]['full_sequence']['evalue'],
-                                        domain,
-                                        len(slave_dictionary[target]["this_domain"].keys()),
-                                        slave_dictionary[target]["this_domain"][domain]['score'],
-                                        slave_dictionary[target]["this_domain"][domain]['i_evalue'],
-                                        slave_dictionary[target]["this_domain"][domain]['hmm_coord'],
-                                        slave_dictionary[target]["this_domain"][domain]['ali_coord'],
-                                        slave_dictionary[target]["this_domain"][domain]['accuracy']
-                                    )
-                                )
+            if verbose :
+                best_match.append(
+                    (
+                        best_target,
+                        slave_dictionary[best_target]["target_accession"],
+                        slave_dictionary[best_target]["description"],
+                        slave_dictionary[best_target]['full_sequence']['evalue'],
+                        slave_dictionary[best_target]['full_sequence']['score'],
+                        slave_dictionary[best_target]['full_sequence']['bias'],
+                        domain,
+                        len(slave_dictionary[best_target]["this_domain"].keys()),
+                        slave_dictionary[best_target]["this_domain"][best_domain]['c_evalue'],
+                        slave_dictionary[best_target]["this_domain"][best_domain]['i_evalue'],
+                        slave_dictionary[best_target]["this_domain"][best_domain]['score'],
+                        slave_dictionary[best_target]["this_domain"][best_domain]['bias'],
+                        slave_dictionary[best_target]["this_domain"][best_domain]['hmm_coord'],
+                        slave_dictionary[best_target]["this_domain"][best_domain]['ali_coord'],
+                        slave_dictionary[best_target]["this_domain"][best_domain]['env_coord'],
+                        slave_dictionary[best_target]["this_domain"][best_domain]['accuracy']
+                    )
+                )
+            else:
+                best_match.append(
+                    (
+                        best_target,
+                        slave_dictionary[best_target]['full_sequence']['score'],
+                        slave_dictionary[best_target]['full_sequence']['evalue'],
+                        domain,
+                        len(slave_dictionary[best_target]["this_domain"].keys()),
+                        slave_dictionary[best_target]["this_domain"][best_domain]['score'],
+                        slave_dictionary[best_target]["this_domain"][best_domain]['i_evalue'],
+                        slave_dictionary[best_target]["this_domain"][best_domain]['hmm_coord'],
+                        slave_dictionary[best_target]["this_domain"][best_domain]['ali_coord'],
+                        slave_dictionary[best_target]["this_domain"][best_domain]['accuracy']
+                    )
+                )
             # User asked for a number of best match higher than the total number of available matches
             if not slave_dictionary :
                 break   # Exit the While loop
