@@ -271,8 +271,8 @@ class parsHMMER:
                         if slave_dictionary[target]["this_domain"][domain]['i_evalue'] < max_d :
                             best_domain = domain
                             best_target = target
-                            max_t = slave_dictionary[target]['full_sequence']['evalue']
-                            max_d = slave_dictionary[target]["this_domain"][domain]['i_evalue']
+                            max_t = slave_dictionary[best_target]['full_sequence']['evalue']
+                            max_d = slave_dictionary[best_target]["this_domain"][best_domain]['i_evalue']
             if verbose :
                 best_match.append(
                     (
@@ -309,13 +309,14 @@ class parsHMMER:
                         slave_dictionary[best_target]["this_domain"][best_domain]['accuracy']
                     )
                 )
-            # User asked for a number of best match higher than the total number of available matches
-            if not slave_dictionary :
-                break   # Exit the While loop
+           
             slave_dictionary[best_target]['this_domain'].pop(best_domain, None)
             if not slave_dictionary[best_target]['this_domain'] :
                 # If we ended up removing all the domains for that target, pop the target too
                 slave_dictionary.pop(best_target, None)
+            # User asked for a number of best match higher than the total number of available matches
+            if not slave_dictionary :
+                break   # Exit the While loop
             i += 1
         return best_match
 
